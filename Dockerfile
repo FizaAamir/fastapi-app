@@ -2,18 +2,17 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy dependencies first for better caching
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY ./fastapi-testapp /app/fastapi-testapp
+# Copy the app code
+COPY . /app
 
-# Set the correct working directory
-WORKDIR /app/fastapi-testapp  # Ensure main.py is accessible
+# Set the working directory to /app where main.py is located
+WORKDIR /app
 
 EXPOSE 8080
 
-# Make sure main.py is being executed from the correct directory
+# Run Uvicorn with the correct module path
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-
-
-
